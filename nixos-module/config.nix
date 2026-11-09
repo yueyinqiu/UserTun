@@ -6,51 +6,61 @@
 let
   cfg = config.services.user-tun.single-user;
 
-  singBoxConfig = pkgs.writeText "user-tun-sing-box.json" (builtins.toJSON {
-    log = { level = "info"; };
-    dns = {
-      servers = [
-        { type = "local"; tag = "local"; }
+  singBoxConfig = pkgs.writeText "user-tun-sing-box.json" (
+    builtins.toJSON {
+      log = {
+        level = "info";
+      };
+      dns = {
+        servers = [
+          {
+            type = "local";
+            tag = "local";
+          }
+          {
+            type = "fakeip";
+            tag = "fakeip";
+            inet4_range = cfg.fakeIpRange;
+            inet6_range = cfg.fakeIp6Range;
+          }
+        ];
+        rules = [
+          { server = "fakeip"; }
+        ];
+        final = "local";
+      };
+      inbounds = [
         {
-          type = "fakeip";
-          tag = "fakeip";
-          inet4_range = cfg.fakeIpRange;
-          inet6_range = cfg.fakeIp6Range;
+          type = "tun";
+          tag = "tun";
+          stack = "gvisor";
+          address = [
+            cfg.tunAddress
+            cfg.tunInet6Address
+          ];
+          auto_route = true;
         }
       ];
-      rules = [
-        { server = "fakeip"; }
+      outbounds = [
+        {
+          type = "socks";
+          tag = "user-tun";
+          server = "127.0.0.1";
+          server_port = cfg.socksPort;
+          version = "5";
+        }
       ];
-      final = "local";
-    };
-    inbounds = [
-      {
-        type = "tun";
-        tag = "tun";
-        stack = "gvisor";
-        address = [
-          cfg.tunAddress
-          cfg.tunInet6Address
+      route = {
+        rules = [
+          {
+            port = [ 53 ];
+            action = "hijack-dns";
+          }
         ];
-        auto_route = true;
-      }
-    ];
-    outbounds = [
-      {
-        type = "socks";
-        tag = "mihomo";
-        server = "127.0.0.1";
-        server_port = cfg.socksPort;
-        version = "5";
-      }
-    ];
-    route = {
-      rules = [
-        { port = [ 53 ]; action = "hijack-dns"; }
-      ];
-      final = "mihomo";
-    };
-  });
+        final = "user-tun";
+      };
+    }
+  );
 in
 {
   systemd.services.user-tun-singbox = {
