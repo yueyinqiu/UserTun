@@ -14,25 +14,25 @@
       '';
     };
 
-    socksPort = lib.mkOption {
+    upstreamPort = lib.mkOption {
       type = lib.types.port;
       default = 7890;
-      description = "The socks port of the user-side proxy that sing-box dials directly.";
+      description = "The socks port of the user-side proxy (sing-box's upstream) that sing-box dials directly.";
     };
 
-    tunAddress = lib.mkOption {
+    tun4Address = lib.mkOption {
       type = lib.types.str;
       default = "172.18.0.1/30";
       description = "IPv4 address of the tun interface.";
     };
 
-    tunInet6Address = lib.mkOption {
+    tun6Address = lib.mkOption {
       type = lib.types.str;
       default = "fdfe:dcba:9876::1/126";
       description = "IPv6 address of the tun interface.";
     };
 
-    fakeIpRange = lib.mkOption {
+    fakeIp4Range = lib.mkOption {
       type = lib.types.str;
       default = "198.18.0.0/15";
       description = "IPv4 fake-ip range.";

@@ -20,7 +20,7 @@ let
           {
             type = "fakeip";
             tag = "fakeip";
-            inet4_range = cfg.fakeIpRange;
+            inet4_range = cfg.fakeIp4Range;
             inet6_range = cfg.fakeIp6Range;
           }
         ];
@@ -35,8 +35,8 @@ let
           tag = "tun";
           stack = "gvisor";
           address = [
-            cfg.tunAddress
-            cfg.tunInet6Address
+            cfg.tun4Address
+            cfg.tun6Address
           ];
           auto_route = true;
         }
@@ -46,7 +46,7 @@ let
           type = "socks";
           tag = "user-tun";
           server = "127.0.0.1";
-          server_port = cfg.socksPort;
+          server_port = cfg.upstreamPort;
           version = "5";
         }
       ];

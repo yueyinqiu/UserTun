@@ -23,7 +23,7 @@ So the system side keeps a thin sing-box that only opens a tun and tunnels every
  user-side proxy (127.0.0.1:7890) ──► real outbound NIC (interface-name)
 ```
 
-- sing-box opens one tun with `auto_route = true` and one socks outbound to `127.0.0.1:<socksPort>`;
+- sing-box opens one tun with `auto_route = true` and one socks outbound to `127.0.0.1:<upstreamPort>`;
 - DNS is hijacked to fake-ip (v4/v6), so the **domain** is handed off to the proxy instead of a resolved IP — the proxy's own `DOMAIN` rules keep working;
 - the proxy sets `interface-name` to the outbound NIC, so its own egress isn't pulled back into the tun (loop).
 
@@ -54,7 +54,7 @@ So the system side keeps a thin sing-box that only opens a tun and tunnels every
         {
           services.user-tun.single-user = {
             enable = true;
-            # socksPort = 7890;  # default, see below
+            # upstreamPort = 7890;  # default, see below
           };
         }
       ];
@@ -71,17 +71,17 @@ Options under `services.user-tun.single-user`:
 | --- | --- | --- | --- |
 | `enable` | bool | `false` | Whether to enable UserTun |
 | `sing-box-package` | package | `pkgs.sing-box` | The `sing-box` package used by the tun service |
-| `socksPort` | port | `7890` | Socks port of the user-side proxy that sing-box dials |
-| `tunAddress` | str | `172.18.0.1/30` | IPv4 address of the tun interface |
-| `tunInet6Address` | str | `fdfe:dcba:9876::1/126` | IPv6 address of the tun interface |
-| `fakeIpRange` | str | `198.18.0.0/15` | IPv4 fake-ip range |
+| `upstreamPort` | port | `7890` | The socks port of the user-side proxy (sing-box's upstream) that sing-box dials |
+| `tun4Address` | str | `172.18.0.1/30` | IPv4 address of the tun interface |
+| `tun6Address` | str | `fdfe:dcba:9876::1/126` | IPv6 address of the tun interface |
+| `fakeIp4Range` | str | `198.18.0.0/15` | IPv4 fake-ip range |
 | `fakeIp6Range` | str | `2001:2::/48` | IPv6 fake-ip range |
 
 ## User side (proxy)
 
 The system side only forwards traffic; the actual proxy config lives in your user-side proxy (mihomo / sing-box / clash, anything that speaks socks). Two conventions:
 
-1. the proxy's `mixed-port` (or socks port) = `services.user-tun.single-user.socksPort` (default `7890`) — sing-box dials that port;
+1. the proxy's `mixed-port` (or socks port) = `services.user-tun.single-user.upstreamPort` (default `7890`) — sing-box dials that port;
 2. set `interface-name` to the real outbound NIC, so the proxy's own egress doesn't loop back into the tun.
 
 Minimal example (in real deployment this lives in your home config):
