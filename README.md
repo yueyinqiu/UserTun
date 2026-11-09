@@ -51,6 +51,8 @@ interface-name: eth0   # 你的出站网卡名
 
 ## Options
 
+以下 option 都在 `services.user-tun.single-user.` 命名空间下：
+
 | Option | 类型 | 默认 | 说明 |
 |---|---|---|---|
 | `enable` | bool | `false` | 启用 |
