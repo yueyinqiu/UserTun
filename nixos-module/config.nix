@@ -64,12 +64,13 @@ let
 in
 {
   systemd.services.user-tun-singbox = {
-    description = "UserTun system sing-box (tun -> per-user mihomo)";
+    description = "UserTun system sing-box (tun -> user-side proxy)";
     wantedBy = [ "multi-user.target" ];
+    wants = [ "network-online.target" ];
     after = [ "network-online.target" ];
     serviceConfig = {
       DynamicUser = true;
-      ExecStart = "${lib.getExe cfg.package} run -c ${singBoxConfig}";
+      ExecStart = "${lib.getExe cfg.sing-box-package} run -c ${singBoxConfig}";
       Restart = "on-failure";
       AmbientCapabilities = [ "CAP_NET_ADMIN" ];
       PrivateDevices = false;
