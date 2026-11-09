@@ -67,8 +67,10 @@ interface-name: eth0   # 你的出站网卡名
 
 ## 测试
 
+测试是独立的 flake，在 `test/` 目录下：
+
 ```sh
-nix flake check
+cd test && nix flake check
 ```
 
 `test/` 里是一对 NixOS 虚拟机（router + target echo server），验证 tun 进流量、fake-ip 域名下发到用户侧代理、`interface-name` 出站，覆盖 TCP / UDP / AAAA。
